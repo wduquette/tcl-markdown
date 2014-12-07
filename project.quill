@@ -1,0 +1,18 @@
+project tcl-markdown 0.0.1 "Markdown Processor"
+
+homepage http://home.page.url
+provide markdown
+app md2html
+
+require Tcl 8.6.3
+
+dist install {
+    %libs
+    docs/*.html
+    docs/man*/*.html
+    README.md
+    LICENSE
+}
+
+
+
