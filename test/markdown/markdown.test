@@ -23,7 +23,6 @@ namespace import ::tcltest::test
 # Load the package to be tested
 
 source ../../lib/markdown/pkgModules.tcl
-namespace import ::markdown::*
 
 #-------------------------------------------------------------------------
 # Setup
@@ -31,11 +30,43 @@ namespace import ::markdown::*
 # TBD
 
 #-------------------------------------------------------------------------
-# dummy
+# convert
 
-test dummy-1.1 {dummy test} -body {
-    set a false
-} -result {true}
+test convert-1.1 {bq test} -body {
+    set md   [::tcltest::viewFile bq.md]
+    set html [::tcltest::viewFile bq.html]
+    expr {$html eq [markdown convert $md]}
+} -result {1}
+
+test convert-1.2 {code test} -body {
+    set md   [::tcltest::viewFile code.md]
+    set html [::tcltest::viewFile code.html]
+    expr {$html eq [markdown convert $md]}
+} -result {1}
+
+test convert-1.3 {comments test} -body {
+    set md   [::tcltest::viewFile comments.md]
+    set html [::tcltest::viewFile comments.html]
+    expr {$html eq [markdown convert $md]}
+} -result {1}
+
+test convert-1.4 {inline test} -body {
+    set md   [::tcltest::viewFile inline.md]
+    set html [::tcltest::viewFile inline.html]
+    expr {$html eq [markdown convert $md]}
+} -result {1}
+
+test convert-1.5 {lists test} -body {
+    set md   [::tcltest::viewFile lists.md]
+    set html [::tcltest::viewFile lists.html]
+    expr {$html eq [markdown convert $md]}
+} -result {1}
+
+test convert-1.6 {p_br_h_hr test} -body {
+    set md   [::tcltest::viewFile p_br_h_hr.md]
+    set html [::tcltest::viewFile p_br_h_hr.html]
+    expr {$html eq [markdown convert $md]}
+} -result {1}
 
 #-------------------------------------------------------------------------
 # Cleanup
