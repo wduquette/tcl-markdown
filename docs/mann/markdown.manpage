@@ -1,23 +1,80 @@
-<manpage markdown(n) "markdown markdown module">
+<manpage markdown(n) "Markdown Processor">
 
 <section SYNOPSIS>
+
+<pre>package require markdown <version></pre>
 
 <itemlist>
 
 <section DESCRIPTION>
 
-TODO: General description of the markdown(n) module
+markdown(n) is a Markdown to XHTML processor.  It supports the original 
+basic syntax as defined by John Gruber on his homepage at<p>
+
+<link http://daringfireball.net/projects/markdown/syntax><p>
+
+Common extensions are not supported at this time.<p>
 
 <section COMMANDS>
 
-TODO: Usage information for the markdown(n) module.
+The markdown(n) package provides the following commands:<p>
+
+<deflist commands>
+
+<defitem "markdown convert" {markdown convert <i markdown>}>
+
+Returns and XHTML fragment that is equivalent to the <i markdown> input.<p>
+
+</deflist commands>
+
+<section EXAMPLE>
+
+This input:<p>
+
+<example>
+Lorem ipsum dolor sit amet, consectetur adipisicing elit,
+
+* sed do eiusmod tempor incididunt
+    * ut labore et dolore magna aliqua.
+* Ut enim ad minim veniam, quis nostrud
+    * exercitation ullamco laboris nisi ut
+    * aliquip ex ea commodo consequat.
+
+Duis aute irure dolor in reprehenderit in voluptate velit
+esse cillum dolore eu fugiat nulla pariatur...   
+</example><p>
+
+produces this output:<p>
+
+<example>
+&lt;p&gt;Lorem ipsum dolor sit amet, consectetur adipisicing elit,&lt;/p&gt;
+
+&lt;ul&gt;
+    &lt;li&gt;sed do eiusmod tempor incididunt
+        &lt;ul&gt;
+            &lt;li&gt;ut labore et dolore magna aliqua.&lt;/li&gt;
+        &lt;/ul&gt;
+    &lt;/li&gt;
+    &lt;li&gt;Ut enim ad minim veniam, quis nostrud
+        &lt;ul&gt;
+            &lt;li&gt;exercitation ullamco laboris nisi ut&lt;/li&gt;
+            &lt;li&gt;aliquip ex ea commodo consequat.&lt;/li&gt;
+        &lt;/ul&gt;
+    &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Duis aute irure dolor in reprehenderit in voluptate velit
+esse cillum dolore eu fugiat nulla pariatur...&lt;/p&gt;
+</example>
 
 <section AUTHOR>
 
-TBD<p>
+This version is maintained by Will Duquette.  The original code was 
+by Tobias Koch and Daynil Bohdan, as part of the
+<link https://github.com/tobijk/caius/ "Caius"> test tool.<p>
 
 <section "SEE ALSO">
 
-TBD<p>
+<xref markdown(5)>.
 
 </manpage>
