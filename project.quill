@@ -13,6 +13,3 @@ dist install {
     README.md
     LICENSE
 }
-
-
-

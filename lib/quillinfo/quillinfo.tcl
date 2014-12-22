@@ -23,7 +23,7 @@ namespace eval ::quillinfo {
     docs/man*/*.html
     README.md
     LICENSE
-} homepage http://home.page.url requires Tcl exetype-md2html kit local-Tcl 0 apps md2html version 0.0.1 version-Tcl 8.6.3 project tcl-markdown dists install}
+} homepage http://home.page.url requires Tcl exetype-md2html kit local-Tcl 0 apps md2html version 0.0.1 version-Tcl 8.6 project tcl-markdown dists install}
 
     namespace export \
         project      \

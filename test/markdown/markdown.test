@@ -27,7 +27,12 @@ source ../../lib/markdown/pkgModules.tcl
 #-------------------------------------------------------------------------
 # Setup
 
-# TBD
+proc cmp {s1 s2} {
+    set s1 [string trim $s1]
+    set s2 [string trim $s2]
+
+    return [expr {$s1 eq $s2}]
+}
 
 #-------------------------------------------------------------------------
 # convert
@@ -35,37 +40,37 @@ source ../../lib/markdown/pkgModules.tcl
 test convert-1.1 {bq test} -body {
     set md   [::tcltest::viewFile bq.md]
     set html [::tcltest::viewFile bq.html]
-    expr {$html eq [markdown convert $md]}
+    cmp $html [markdown convert $md]
 } -result {1}
 
 test convert-1.2 {code test} -body {
     set md   [::tcltest::viewFile code.md]
     set html [::tcltest::viewFile code.html]
-    expr {$html eq [markdown convert $md]}
+    cmp $html [markdown convert $md]
 } -result {1}
 
 test convert-1.3 {comments test} -body {
     set md   [::tcltest::viewFile comments.md]
     set html [::tcltest::viewFile comments.html]
-    expr {$html eq [markdown convert $md]}
+    cmp $html [markdown convert $md]
 } -result {1}
 
 test convert-1.4 {inline test} -body {
     set md   [::tcltest::viewFile inline.md]
     set html [::tcltest::viewFile inline.html]
-    expr {$html eq [markdown convert $md]}
+    cmp $html [markdown convert $md]
 } -result {1}
 
 test convert-1.5 {lists test} -body {
     set md   [::tcltest::viewFile lists.md]
     set html [::tcltest::viewFile lists.html]
-    expr {$html eq [markdown convert $md]}
+    cmp $html [markdown convert $md]
 } -result {1}
 
 test convert-1.6 {p_br_h_hr test} -body {
     set md   [::tcltest::viewFile p_br_h_hr.md]
     set html [::tcltest::viewFile p_br_h_hr.html]
-    expr {$html eq [markdown convert $md]}
+    cmp $html [markdown convert $md]
 } -result {1}
 
 #-------------------------------------------------------------------------
