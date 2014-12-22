@@ -1,4 +1,4 @@
-<manpage md2html(1) "tcl-markdown md2html Application">
+<manpage md2html(1) "Markdown to HTML Conversion Tool">
 
 <section SYNOPSIS>
 
@@ -6,18 +6,30 @@
 
 <section DESCRIPTION>
 
-TODO: General description of the md2html(1) application
+This tool converts one or more markdown files into the equivalent HTML.
+<p>
+
 
 <section USAGE>
 
-TODO: Usage information for the md2html(1) application.
+<deflist usage>
+
+<defitem md2html {md2html <i file.md>...}>
+
+Converts the listed <xref markdown(5)> files to HTML.  Each file
+"<tt><i filename>.md</tt>", it produces "<tt><i filename>.html</tt>".<p>
+
+At present, the output is simply the XHTML fragment that's equivalent to
+the input.  No <tag html>, <tag head>, or <tag body> elements are added.<p> 
+
+</deflist usage>
 
 <section AUTHOR>
 
-TBD<p>
+Will Duquette.<p>
 
 <section "SEE ALSO">
 
-TBD<p>
+<xref markdown(5)>, <xref markdown(n)>.<p>
 
 </manpage>

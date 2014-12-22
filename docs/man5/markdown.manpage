@@ -1,0 +1,36 @@
+<manpage markdown(5) "Markdown Format">
+
+<section SYNOPSIS>
+
+<itemlist>
+
+<section DESCRIPTION>
+
+markdown(5) is a simple syntax used for producing readable text files that
+can easily be translated into HTML for display on the web.<p>
+
+Ideally, this man page would describe the dialect of markdown implemented 
+by <xref markdown(n)>.  As it happens, however, <xref markdown(n)> is still
+tied to the original basic syntax as defined by John Gruber on his 
+homepage at<p>
+
+<link http://daringfireball.net/projects/markdown/syntax><p>
+
+Common extensions are not supported at this time.<p>
+
+If you find a bug in <xref markdown(n)>'s output, please create a new
+issue in the "Tcl-Markdown" issue tracker at<p>
+
+<link https://github.com/wduquette/tcl-markdown>.<p>
+
+<section AUTHOR>
+
+This version is maintained by Will Duquette.  The original code was 
+by Tobias Koch and Danyil Bohdan, as part of the
+<link https://github.com/tobijk/caius/ "Caius"> test tool.<p>
+
+<section "SEE ALSO">
+
+<xref markdown(n)>, <xref md2html(1)>.
+
+</manpage>

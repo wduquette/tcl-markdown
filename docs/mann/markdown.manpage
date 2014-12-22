@@ -70,11 +70,11 @@ esse cillum dolore eu fugiat nulla pariatur...&lt;/p&gt;
 <section AUTHOR>
 
 This version is maintained by Will Duquette.  The original code was 
-by Tobias Koch and Daynil Bohdan, as part of the
+by Tobias Koch and Danyil Bohdan, as part of the
 <link https://github.com/tobijk/caius/ "Caius"> test tool.<p>
 
 <section "SEE ALSO">
 
-<xref markdown(5)>.
+<xref markdown(5)>, <xref md2html(1)>.
 
 </manpage>
