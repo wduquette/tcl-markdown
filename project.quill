@@ -4,7 +4,7 @@ homepage http://home.page.url
 provide markdown
 app md2html
 
-require Tcl 8.6.3
+require Tcl 8.6
 
 dist install {
     %libs

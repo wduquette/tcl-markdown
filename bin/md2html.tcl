@@ -23,7 +23,7 @@ set libdir [file normalize [file join $bindir .. lib]]
 set auto_path [linsert $auto_path 0 $libdir]
 
 # -quill-tcl-begin
-package require Tcl 8.6.3
+package require Tcl 8.6
 # -quill-tcl-end
 
 # quillinfo(n) is a generated package containing this project's 
@@ -33,7 +33,7 @@ package require quillinfo
 # If it's a gui, load Tk.
 if {[quillinfo isgui md2html]} {
 # -quill-tk-begin
-package require Tk 8.6.3
+package require Tk 8.6
 # -quill-tk-end
 }
 
