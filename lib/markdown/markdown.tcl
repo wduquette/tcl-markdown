@@ -23,16 +23,15 @@ namespace eval ::markdown {
 #-------------------------------------------------------------------------
 # Commands
 
-##
+# markdown convert markdown
 #
-# Converts text written in markdown to HTML.
+# markdown - Markdown text to convert.
 #
-# @param markdown  currently takes as a single argument the text in markdown
-#
-# The output of this function is only a fragment, not a complete HTML
-# document. The format of the output is generic XHTML.
-#
+# Converts text written in markdown to HTML.  The result is an XHTML
+# fragment, not a complete document.
+
 proc ::markdown::convert {markdown} {
+    # FIRST, normalize whitespace
     append markdown \n
 
     regsub -all {\r\n}  $markdown \n     markdown
@@ -40,17 +39,19 @@ proc ::markdown::convert {markdown} {
     regsub -all {\t}    $markdown {    } markdown
     set markdown [string trim $markdown]
 
-    # COLLECT REFERENCES
-    array set ::markdown::_references [collect_references markdown]
+    # NEXT, Collect references
+    array set ::markdown::_references [CollectReferences $markdown]
 
-    # PROCESS
-    return [apply_templates markdown]
+    # NEXT, Produce output
+    return [ApplyTemplates $markdown]
 }
 
-## \private
-proc ::markdown::collect_references {markdown_var} {
-    upvar $markdown_var markdown
-
+# CollectReferences markdown
+#
+# markdown  - The Markdown text to convert
+#
+# TBD: 
+proc ::markdown::CollectReferences {markdown} {
     set lines [split $markdown \n]
     set no_lines [llength $lines]
     set index 0
@@ -87,10 +88,14 @@ proc ::markdown::collect_references {markdown_var} {
     return [array get references]
 }
 
-## \private
-proc ::markdown::apply_templates {markdown_var {parent {}}} {
-    upvar $markdown_var markdown
+# ApplyTemplates markdown ?parent?
+#
+# markdown   - Some markdown text to process
+# parent     - The parent (an element name?)
+#
+# TBD?
 
+proc ::markdown::ApplyTemplates {markdown {parent {}}} {
     set lines    [split $markdown \n]
     set no_lines [llength $lines]
     set index    0
@@ -135,7 +140,7 @@ proc ::markdown::apply_templates {markdown_var {parent {}}} {
                 set h_level 0
                 set h_result {}
 
-                while {$index < $no_lines && ![is_empty_line $line]} {
+                while {$index < $no_lines && ![IsEmptyLine $line]} {
                     incr index
 
                     if {!$h_level} {
@@ -149,7 +154,7 @@ proc ::markdown::apply_templates {markdown_var {parent {}}} {
                 }
 
                 set h_result [\
-                    parse_inline [\
+                    ParseInline [\
                         regsub -all {^\s*#+\s*|\s*#+\s*$} [join $h_result \n] {} \
                     ]\
                 ]
@@ -165,13 +170,13 @@ proc ::markdown::apply_templates {markdown_var {parent {}}} {
 
                     lappend bq_result [regsub {^[ ]{0,3}\>[ ]?} $line {}]
 
-                    if {[is_empty_line [lindex $lines $index]]} {
+                    if {[IsEmptyLine [lindex $lines $index]]} {
                         set eoq 0
 
                         for {set peek $index} {$peek < $no_lines} {incr peek} {
                             set line [lindex $lines $peek]
 
-                            if {![is_empty_line $line]} {
+                            if {![IsEmptyLine $line]} {
                                 if {![regexp {^[ ]{0,3}\>} $line]} {
                                     set eoq 1
                                 }
@@ -187,7 +192,7 @@ proc ::markdown::apply_templates {markdown_var {parent {}}} {
                 set bq_result [string trim [join $bq_result \n]]
 
                 append result <blockquote>\n \
-                                [apply_templates bq_result] \
+                                [ApplyTemplates $bq_result] \
                               \n</blockquote>
             }
             {^\s{4,}\S+} {
@@ -197,7 +202,7 @@ proc ::markdown::apply_templates {markdown_var {parent {}}} {
                 while {$index < $no_lines} {
                     incr index
 
-                    lappend code_result [html_escape [\
+                    lappend code_result [HtmlEscape [\
                         regsub {^    } $line {}]\
                     ]
 
@@ -205,7 +210,7 @@ proc ::markdown::apply_templates {markdown_var {parent {}}} {
                     for {set peek $index} {$peek < $no_lines} {incr peek} {
                         set line [lindex $lines $peek]
 
-                        if {![is_empty_line $line]} {
+                        if {![IsEmptyLine $line]} {
                             if {![regexp {^\s{4,}} $line]} {
                                 set eoc 1
                             }
@@ -244,7 +249,7 @@ proc ::markdown::apply_templates {markdown_var {parent {}}} {
                     set in_p 1
                     set p_count 1
 
-                    if {[is_empty_line $last_line]} { incr p_count }
+                    if {[IsEmptyLine $last_line]} { incr p_count }
 
                     for {set peek $index} {$peek < $no_lines} {incr peek} {
                         set line [lindex $lines $peek]
@@ -254,7 +259,7 @@ proc ::markdown::apply_templates {markdown_var {parent {}}} {
                             set in_p 1
                         }
 
-                        if {[is_empty_line $line]} {
+                        if {[IsEmptyLine $line]} {
                             set in_p 0
                         }\
                         elseif {[regexp {^    } $line]} {
@@ -280,17 +285,17 @@ proc ::markdown::apply_templates {markdown_var {parent {}}} {
                     set item_result [join $item_result \n]
 
                     if {$p_count > 1} {
-                        set item_result [apply_templates item_result li]
+                        set item_result [ApplyTemplates $item_result li]
                     } else {
                         if {[regexp -lineanchor \
                             {(\A.*?)((?:^[ ]{0,3}(?:\*|-|\+) |^[ ]{0,3}\d+\. ).*\Z)} \
                             $item_result \
                             match para rest]} \
                         {
-                            set item_result [parse_inline $para]
-                            append item_result [apply_templates rest]
+                            set item_result [ParseInline $para]
+                            append item_result [ApplyTemplates $rest]
                         } else {
-                            set item_result [parse_inline $item_result]
+                            set item_result [ParseInline $item_result]
                         }
                     }
 
@@ -315,7 +320,7 @@ proc ::markdown::apply_templates {markdown_var {parent {}}} {
 
                         append buffer $line \n
 
-                        if {[is_empty_line $line]} {
+                        if {[IsEmptyLine $line]} {
                             break
                         }
 
@@ -343,7 +348,7 @@ proc ::markdown::apply_templates {markdown_var {parent {}}} {
                 set p_type p
                 set p_result {}
 
-                while {($index < $no_lines) && ![is_empty_line $line]} \
+                while {($index < $no_lines) && ![IsEmptyLine $line]} \
                 {
                     incr index
 
@@ -381,12 +386,12 @@ proc ::markdown::apply_templates {markdown_var {parent {}}} {
                 }
 
                 set p_result [\
-                    parse_inline [\
+                    ParseInline [\
                         string trim [join $p_result \n]\
                     ]\
                 ]
 
-                if {[is_empty_line [regsub -all {<!--.*?-->} $p_result {}]]} {
+                if {[IsEmptyLine [regsub -all {<!--.*?-->} $p_result {}]]} {
                     # Do not make a new paragraph for just comments.
                     append result $p_result
                 } else {
@@ -399,8 +404,13 @@ proc ::markdown::apply_templates {markdown_var {parent {}}} {
     return $result
 }
 
-## \private
-proc ::markdown::parse_inline {text} {
+# ParseInline text
+#
+# text - Markdown text to parse
+#
+# TBD?
+
+proc ::markdown::ParseInline {text} {
     set text [regsub -all -lineanchor {[ ]{2,}$} $text <br/>]
 
     set index 0
@@ -445,7 +455,7 @@ proc ::markdown::parse_inline {text} {
                         set tag em
                     }
 
-                    append result "<$tag>[parse_inline $sub]</$tag>"
+                    append result "<$tag>[ParseInline $sub]</$tag>"
                     incr index [string length $m]
                     continue
                 }
@@ -460,7 +470,7 @@ proc ::markdown::parse_inline {text} {
 
                     set sub [string trim [string range $text $start $stop]]
 
-                    append result "<code>[html_escape $sub]</code>"
+                    append result "<code>[HtmlEscape $sub]</code>"
                     set index [expr [lindex $m 1] + 1]
                     continue
                 }
@@ -484,9 +494,9 @@ proc ::markdown::parse_inline {text} {
 
                     lassign $::markdown::_references([string tolower $lbl]) url title
 
-                    set url [html_escape [string trim $url {<> }]]
-                    set txt [parse_inline $txt]
-                    set title [parse_inline $title]
+                    set url [HtmlEscape [string trim $url {<> }]]
+                    set txt [ParseInline $txt]
+                    set title [ParseInline $title]
 
                     set match_found 1
                 } elseif {[regexp -start $index $re_inlinelink $text m txt url_and_title]} {
@@ -503,9 +513,9 @@ proc ::markdown::parse_inline {text} {
                         set title {}
                     }
 
-                    set url [html_escape [string trim $url {<> }]]
-                    set txt [parse_inline $txt]
-                    set title [parse_inline $title]
+                    set url [HtmlEscape [string trim $url {<> }]]
+                    set txt [ParseInline $txt]
+                    set title [ParseInline $title]
 
                     set match_found 1
                 }
@@ -554,7 +564,7 @@ proc ::markdown::parse_inline {text} {
                     continue
                 }
 
-                set chr [html_escape $chr]
+                set chr [HtmlEscape $chr]
             }
             {&} {
                 # ENTITIES
@@ -564,7 +574,7 @@ proc ::markdown::parse_inline {text} {
                     continue
                 }
 
-                set chr [html_escape $chr]
+                set chr [HtmlEscape $chr]
             }
             {-} {
                 # EMDASH
@@ -578,7 +588,7 @@ proc ::markdown::parse_inline {text} {
             {'} -
             "\"" {
                 # OTHER SPECIAL CHARACTERS
-                set chr [html_escape $chr]
+                set chr [HtmlEscape $chr]
             }
             default {}
         }
@@ -590,13 +600,23 @@ proc ::markdown::parse_inline {text} {
     return $result
 }
 
-## \private
-proc ::markdown::is_empty_line {line} {
+# IsEmptyLine line
+#
+# line  - A line of text
+#
+# Returns 1 if the line is empty, and 0 otherwise.
+
+proc ::markdown::IsEmptyLine {line} {
     return [regexp {^\s*$} $line]
 }
 
-## \private
-proc ::markdown::html_escape {text} {
+# HtmlEscape text
+#
+# text   - some input text
+#
+# Replaces special characters in the input text with HTML attributes.
+
+proc ::markdown::HtmlEscape {text} {
     return [string map {<!-- <!-- --> --> & &amp; < &lt; > &gt; ' &apos; \" &quot;} $text]
 }
 
