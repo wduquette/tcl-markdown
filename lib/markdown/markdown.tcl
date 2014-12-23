@@ -3,7 +3,7 @@
 #    markdown.tcl
 #
 # PROJECT:
-#    tcl-markdown: Your project description
+#    tcl-markdown: Markdown Processor for Tcl
 #
 # DESCRIPTION:
 #    markdown(n): Implementation File
@@ -14,10 +14,24 @@
 # Exported Commands
 
 namespace eval ::markdown {
+    #---------------------------------------------------------------------
+    # Ensemble
     namespace export \
-        convert
+        convert \
+        refs
 
     namespace ensemble create
+
+    #---------------------------------------------------------------------
+    # Package Variables
+
+    # references_: Array, ref -> {url title}.  This contains named
+    # references, as described at 
+    # http://daringfireball.net/projects/markdown/syntax#link:
+    #
+    #    [foo]: http://example.com/ "Optional Title Here"
+
+    variable references_
 }
 
 #-------------------------------------------------------------------------
@@ -31,6 +45,8 @@ namespace eval ::markdown {
 # fragment, not a complete document.
 
 proc ::markdown::convert {markdown} {
+    variable references_
+
     # FIRST, normalize whitespace
     append markdown \n
 
@@ -40,7 +56,7 @@ proc ::markdown::convert {markdown} {
     set markdown [string trim $markdown]
 
     # NEXT, Collect references
-    array set ::markdown::_references [CollectReferences $markdown]
+    CollectReferences $markdown
 
     # NEXT, Produce output
     return [ApplyTemplates $markdown]
@@ -50,13 +66,23 @@ proc ::markdown::convert {markdown} {
 #
 # markdown  - The Markdown text to convert
 #
-# TBD: 
+# Extracts explicitly defined references from the input as a first
+# pass.  References look more or less like this:
+#
+#    [foo]: http://example.com/ "Optional Title Here"
+#
+# See http://daringfireball.net/projects/markdown/syntax#link
+# for the full syntax.
+
 proc ::markdown::CollectReferences {markdown} {
+    variable references_
+
     set lines [split $markdown \n]
     set no_lines [llength $lines]
     set index 0
 
-    array set references {}
+    array unset references_
+    array set references_ {}
 
     while {$index < $no_lines} {
         set line [lindex $lines $index]
@@ -79,13 +105,11 @@ proc ::markdown::CollectReferences {markdown} {
             }
             set ref [string tolower $ref]
             set link [string trim $link {<>}]
-            set references($ref) [list $link $title]
+            set references_($ref) [list $link $title]
         }
 
         incr index
     }
-
-    return [array get references]
 }
 
 # ApplyTemplates markdown ?parent?
@@ -411,6 +435,8 @@ proc ::markdown::ApplyTemplates {markdown {parent {}}} {
 # TBD?
 
 proc ::markdown::ParseInline {text} {
+    variable references_
+
     set text [regsub -all -lineanchor {[ ]{2,}$} $text <br/>]
 
     set index 0
@@ -492,13 +518,20 @@ proc ::markdown::ParseInline {text} {
 
                     if {$lbl eq {}} { set lbl $txt }
 
-                    lassign $::markdown::_references([string tolower $lbl]) url title
+                    set ref [string tolower $lbl]
+                    if {[info exists references_($ref)]} {
+                        lassign $references_($ref) url title
 
-                    set url [HtmlEscape [string trim $url {<> }]]
-                    set txt [ParseInline $txt]
-                    set title [ParseInline $title]
+                        set url [HtmlEscape [string trim $url {<> }]]
+                        set txt [ParseInline $txt]
+                        set title [ParseInline $title]
 
-                    set match_found 1
+                        set match_found 1
+                    } else {
+                        # Unknown ref: just put in the matching text.
+                        append result $m
+                        continue
+                    }
                 } elseif {[regexp -start $index $re_inlinelink $text m txt url_and_title]} {
                     # INLINE
                     incr index [string length $m]

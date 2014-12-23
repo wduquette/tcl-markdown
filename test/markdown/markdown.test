@@ -27,11 +27,49 @@ source ../../lib/markdown/pkgModules.tcl
 #-------------------------------------------------------------------------
 # Setup
 
+# outdent text
+#
+# text   - A multi-line text string
+#
+# This command outdents a multi-line text string to the left margin.
+
+proc outdent {text} {
+    # FIRST, remove any leading blank lines
+    regsub {\A(\s*\n)} $text "" text
+
+    # NEXT, remove any trailing whitespace
+    set text [string trimright $text]
+
+    # NEXT, get the length of the leading on the first line.
+    if {[regexp {\A(\s*)\S} $text dummy leader]} {
+
+        # Remove the leader from the beginning of each indented
+        # line, and update the string.
+        regsub -all -line "^$leader" $text "" text
+    }
+
+    return $text
+}
+
+
 proc cmp {s1 s2} {
     set s1 [string trim $s1]
     set s2 [string trim $s2]
 
     return [expr {$s1 eq $s2}]
+}
+
+# convert in
+#
+# in - markdown input, possibly indented.
+#
+# Outdents the input and converts it to HTML.  Indents it for inclusion
+# in a result.
+proc convert {in} {
+    set lines [split [string trim [markdown convert [outdent $in]]] \n]
+
+    set out [join $lines "\n    "]
+    return "\n    $out\n"
 }
 
 #-------------------------------------------------------------------------
@@ -42,12 +80,14 @@ proc cmp {s1 s2} {
 test convert-1.1 {bq test} -body {
     set md   [::tcltest::viewFile bq.md]
     set html [::tcltest::viewFile bq.html]
+
     cmp $html [markdown convert $md]
 } -result {1}
 
 test convert-1.2 {code test} -body {
     set md   [::tcltest::viewFile code.md]
     set html [::tcltest::viewFile code.html]
+
     cmp $html [markdown convert $md]
 } -result {1}
 
@@ -75,15 +115,51 @@ test convert-1.6 {p_br_h_hr test} -body {
     cmp $html [markdown convert $md]
 } -result {1}
 
+# 2.* - Tcl-Markdown tests
+
+test convert-2.1 {basic text} -body {
+    convert {
+        A line of text.
+
+        Another line of text.
+    }
+} -result {
+    <p>A line of text.</p>
+    
+    <p>Another line of text.</p>
+}
+
+test convert-2.2 {refs} -body {
+    convert {
+        Find it [here][foo]!
+
+        [foo]: http://example.com/  "Optional Title Here"
+    }
+} -result {
+    <p>Find it <a href="http://example.com/" title="Optional Title Here">here</a>!</p>
+}
+
+
+
 #-------------------------------------------------------------------------
 # mdtest: Bugs found while running michelf/mdtest
 
 test mdtest-1.1 {Auto links} -body {
-    set in "
-Auto-link with ampersand: <http://example.com/?foo=1&bar=2>
-    "
-    string trim [markdown convert $in]
-} -result {<p>Auto-link with ampersand: <a href="http://example.com/?foo=1&amp;bar=2">http://example.com/?foo=1&amp;bar=2</a></p>}
+    convert {
+        Auto-link with ampersand: <http://example.com/?foo=1&bar=2>
+    }
+} -result {
+    <p>Auto-link with ampersand: <a href="http://example.com/?foo=1&amp;bar=2">http://example.com/?foo=1&amp;bar=2</a></p>
+}
+
+test mdtest-1.2 {Undefined refs cause syntax error} -body {
+    convert {
+        Undefined ref: [foo]
+    }
+} -result {
+    <p>Undefined ref: [foo]</p>
+}
+
 
 #-------------------------------------------------------------------------
 # Cleanup
