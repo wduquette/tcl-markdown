@@ -144,7 +144,7 @@ test convert-2.2 {refs} -body {
 #-------------------------------------------------------------------------
 # mdtest: Bugs found while running michelf/mdtest
 
-test mdtest-1.1 {Auto links} -body {
+test mdtest-1.1 {Auto links: & not escaped in URL} -body {
     convert {
         Auto-link with ampersand: <http://example.com/?foo=1&bar=2>
     }

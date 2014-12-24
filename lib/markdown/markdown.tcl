@@ -580,6 +580,7 @@ proc ::markdown::ParseInline {text} {
                     continue
                 } elseif {[regexp -start $index $re_autolink $text m email link]} {
                     if {$link ne {}} {
+                        set link [HtmlEscape $link]
                         append result "<a href=\"$link\">$link</a>"
                     } else {
                         set mailto_prefix "mailto:"
