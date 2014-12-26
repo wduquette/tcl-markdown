@@ -144,6 +144,8 @@ test convert-2.2 {refs} -body {
 #-------------------------------------------------------------------------
 # mdtest: Bugs found while running michelf/mdtest
 
+tcltest::testConstraint tbd 0
+
 test mdtest-1.1 {Auto links: & not escaped in URL} -body {
     convert {
         Auto-link with ampersand: <http://example.com/?foo=1&bar=2>
@@ -160,6 +162,15 @@ test mdtest-1.2 {Undefined refs cause syntax error} -body {
     <p>Undefined ref: [foo]</p>
 }
 
+test mdtest-1.3 {Embedded brackets in link} -constraints tbd -body {
+    convert {
+        With [embedded [brackets]] [b].
+
+        [b]: /url/
+    }
+} -result {
+    <p>With <a href="/url/">embedded [brackets]</a>.</p>
+}
 
 #-------------------------------------------------------------------------
 # Cleanup
