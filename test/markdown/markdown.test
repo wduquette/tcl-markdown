@@ -75,52 +75,13 @@ proc convert {in} {
     return "\n    $out\n"
 }
 
+#=========================================================================
+# Tcl-markdown tests
+
 #-------------------------------------------------------------------------
-# convert
+# Conversion tests
 
-# 1.* - Caius markdown tests
-
-test convert-1.1 {bq test} -body {
-    set md   [::tcltest::viewFile bq.md]
-    set html [::tcltest::viewFile bq.html]
-
-    cmp $html [markdown convert $md]
-} -result {1}
-
-test convert-1.2 {code test} -body {
-    set md   [::tcltest::viewFile code.md]
-    set html [::tcltest::viewFile code.html]
-
-    cmp $html [markdown convert $md]
-} -result {1}
-
-test convert-1.3 {comments test} -body {
-    set md   [::tcltest::viewFile comments.md]
-    set html [::tcltest::viewFile comments.html]
-    cmp $html [markdown convert $md]
-} -result {1}
-
-test convert-1.4 {inline test} -body {
-    set md   [::tcltest::viewFile inline.md]
-    set html [::tcltest::viewFile inline.html]
-    cmp $html [markdown convert $md]
-} -result {1}
-
-test convert-1.5 {lists test} -body {
-    set md   [::tcltest::viewFile lists.md]
-    set html [::tcltest::viewFile lists.html]
-    cmp $html [markdown convert $md]
-} -result {1}
-
-test convert-1.6 {p_br_h_hr test} -body {
-    set md   [::tcltest::viewFile p_br_h_hr.md]
-    set html [::tcltest::viewFile p_br_h_hr.html]
-    cmp $html [markdown convert $md]
-} -result {1}
-
-# 2.* - Tcl-Markdown tests
-
-test convert-2.1 {basic text} -body {
+test basic-1.1 {basic text} -body {
     convert {
         A line of text.
 
@@ -132,6 +93,143 @@ test convert-2.1 {basic text} -body {
     <p>Another line of text.</p>
 }
 
+test basic-1.2 {multi-line paragraphs} -body {
+    convert {
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+        eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
+        enim ad minim veniam, quis nostrud exercitation ullamco laboris
+        nisi ut aliquip ex ea commodo consequat. 
+
+        Duis aute irure dolor in reprehenderit in voluptate velit esse 
+        cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat 
+        cupidatat non proident, sunt in culpa qui officia deserunt mollit 
+        anim id est laborum.
+    }
+} -result {
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+    eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
+    enim ad minim veniam, quis nostrud exercitation ullamco laboris
+    nisi ut aliquip ex ea commodo consequat.</p>
+    
+    <p>Duis aute irure dolor in reprehenderit in voluptate velit esse 
+    cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat 
+    cupidatat non proident, sunt in culpa qui officia deserunt mollit 
+    anim id est laborum.</p>
+}
+
+test bquote-1.1 {simple blockquote} -body {
+    convert {
+        >
+        > A line of text.
+        >
+    }
+} -result {
+    <blockquote>
+    <p>A line of text.</p>
+    </blockquote>
+}
+
+test bquote-1.2 {">" on first line only.} -body {
+    convert {
+        > Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+        eiusmod tempor incididunt ut labore et dolore magna aliqua.
+    }
+} -result {
+    <blockquote>
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+    eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+    </blockquote>
+}
+
+test bquote-1.3 {block quote with markup} -body {
+    convert {
+        > ### Heading 3
+        > 
+        > Lorem ipsum dolor sit amet, consectetur adipiscing elit
+    }
+} -result {
+    <blockquote>
+    <h3>Heading 3</h3>
+    
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit</p>
+    </blockquote>
+}
+
+test bquote-1.4 {nested block quotes} -body {
+    convert {
+        > First this.
+        >
+        > > And then this and this
+        > > and this.
+        > 
+        > And then this.
+    }
+} -result {
+    <blockquote>
+    <p>First this.</p>
+    
+    <blockquote>
+    <p>And then this and this
+    and this.</p>
+    </blockquote>
+    
+    <p>And then this.</p>
+    </blockquote>
+}
+
+test bquote-1.5 {complex case (from Caius test suite)} -body {
+    convert {
+        >
+        > > This is what he said. This is what she said. This is what
+        > > he said. This is what she said.
+        > >
+        > > ### Heading 3 #####
+        > >
+        > > This is what he said. This is what she said. This is what
+        > > he said. This is what she said.
+        > >     
+        > >     import os
+        > >     os.path.listdir()
+        > >
+        > > This is what he said. This is what she said. This is what
+        > > he said. This is what she said.
+        >
+        > ## Heading 2
+        >
+        > This is what he said. This is what she said. This is what
+        > he said. This is what she said.
+
+        This is a test.
+    }
+} -result {
+    <blockquote>
+    <blockquote>
+    <p>This is what he said. This is what she said. This is what
+    he said. This is what she said.</p>
+    
+    <h3>Heading 3</h3>
+    
+    <p>This is what he said. This is what she said. This is what
+    he said. This is what she said.</p>
+    
+    <pre><code>import os
+    os.path.listdir()</code></pre>
+    
+    <p>This is what he said. This is what she said. This is what
+    he said. This is what she said.</p>
+    </blockquote>
+    
+    <h2>Heading 2</h2>
+    
+    <p>This is what he said. This is what she said. This is what
+    he said. This is what she said.</p>
+    </blockquote>
+    
+    <p>This is a test.</p>
+}
+
+
+
 test convert-2.2 {refs} -body {
     convert {
         Find it [here][foo]!
@@ -142,6 +240,57 @@ test convert-2.2 {refs} -body {
     <p>Find it <a href="http://example.com/" title="Optional Title Here">here</a>!</p>
 }
 
+
+#=========================================================================
+# Tests related to other processors or test suites
+
+#-------------------------------------------------------------------------
+# Caius Markdown Tests
+#
+# These tests translate entire files.  I prefer tests for individual 
+# features; when a test fails, you don't need to go hunting for the
+# specifics.  But I'm keeping these to show compatibility with the 
+# Caius processor.
+
+# 1.* - Caius markdown tests
+
+test caius-1.1 {bq test} -body {
+    set md   [::tcltest::viewFile bq.md]
+    set html [::tcltest::viewFile bq.html]
+
+    cmp $html [markdown convert $md]
+} -result {1}
+
+test caius-1.2 {code test} -body {
+    set md   [::tcltest::viewFile code.md]
+    set html [::tcltest::viewFile code.html]
+
+    cmp $html [markdown convert $md]
+} -result {1}
+
+test caius-1.3 {comments test} -body {
+    set md   [::tcltest::viewFile comments.md]
+    set html [::tcltest::viewFile comments.html]
+    cmp $html [markdown convert $md]
+} -result {1}
+
+test caius-1.4 {inline test} -body {
+    set md   [::tcltest::viewFile inline.md]
+    set html [::tcltest::viewFile inline.html]
+    cmp $html [markdown convert $md]
+} -result {1}
+
+test caius-1.5 {lists test} -body {
+    set md   [::tcltest::viewFile lists.md]
+    set html [::tcltest::viewFile lists.html]
+    cmp $html [markdown convert $md]
+} -result {1}
+
+test caius-1.6 {p_br_h_hr test} -body {
+    set md   [::tcltest::viewFile p_br_h_hr.md]
+    set html [::tcltest::viewFile p_br_h_hr.html]
+    cmp $html [markdown convert $md]
+} -result {1}
 
 
 #-------------------------------------------------------------------------
