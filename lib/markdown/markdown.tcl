@@ -651,6 +651,6 @@ proc ::markdown::IsEmptyLine {line} {
 # Replaces special characters in the input text with HTML attributes.
 
 proc ::markdown::HtmlEscape {text} {
-    return [string map {<!-- <!-- --> --> & &amp; < &lt; > &gt; ' &apos; \" &quot;} $text]
+    return [string map {<!-- <!-- --> --> & &amp; < &lt; > &gt; \" &quot;} $text]
 }
 

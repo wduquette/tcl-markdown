@@ -66,7 +66,7 @@ results.
   expected results, and that the comparison is a little more forgiving on 
   PHP 5.4.30.
 
-I am trying to fix substantive bugs; but see the mdtest-*.* tests
+I am trying to fix substantive bugs; but see the mdtest-\*.\* tests
 in test/markdown/markdown.test that are tagged with the constraint
 "knownbug".
 
