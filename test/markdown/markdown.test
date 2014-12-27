@@ -228,6 +228,19 @@ test mdtest-1.8 {LRS: link breaks across lines, 2} -constraints knownbug -body {
     <p>The <a href="/url/">link 
     breaks</a> across lines, but with a line-ending space.</p>
 }
+
+test mdtest-1.9 {OAUL: "* * *" line after unordered list} -constraints knownbug -body {
+    # This causes the processor to hang.
+    convert {
+        * asterisk 1
+
+        * * *
+    }
+} -result {
+    <p>The <a href="/url/">link 
+    breaks</a> across lines, but with a line-ending space.</p>
+}
+
 #-------------------------------------------------------------------------
 # Cleanup
 
