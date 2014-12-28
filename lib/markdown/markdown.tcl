@@ -141,6 +141,7 @@ proc ::markdown::ApplyTemplates {markdown {parent {}}} {
                 incr index
             }
             {^[ ]{0,3}\[(.*?[^\\])\]:\s+(\S+)(?:\s+(([\"\']).*[^\\]\4|\(.*[^\\]\))\s*$)?} {
+                # SKIP REFERENCES
                 set next_line [lindex $lines [expr $index + 1]]
 
                 if {[regexp \
@@ -256,6 +257,7 @@ proc ::markdown::ApplyTemplates {markdown {parent {}}} {
                 set list_match $ul_match
                 set list_result {}
 
+                # We don't know which one matched, this is a bit awkward...
                 if {[regexp $ol_match $line]} {
                     set list_type ol
                     set list_match $ol_match
@@ -296,7 +298,9 @@ proc ::markdown::ApplyTemplates {markdown {parent {}}} {
                             if {!$in_p} {
                                 incr p_count
                             }
-                            break
+                            if {$peek != $index} {
+                                break
+                            }
                         }\
                         elseif {!$in_p} {
                             break
