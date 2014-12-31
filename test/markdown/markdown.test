@@ -390,10 +390,7 @@ test mdtest-1.9 {OAUL: "* * *" line after unordered list} -body {
     <li><p>asterisk 1</p>
     
     </li>
-    <li><ul>
-    <li>*</li></ul>
-    
-    </li></ul>
+    <li><p>* *</p></li></ul>
 }
 
 #-------------------------------------------------------------------------

@@ -275,14 +275,24 @@ proc ::markdown::ApplyTemplates {markdown {parent {}}} {
                     set in_p 1
                     set p_count 1
 
-                    if {[IsEmptyLine $last_line]} { incr p_count }
+                    if {[IsEmptyLine $last_line]} { 
+                        incr p_count 
+                    }
 
                     for {set peek $index} {$peek < $no_lines} {incr peek} {
                         set line [lindex $lines $peek]
 
                         if {$peek == $index} {
+                            set last_line $line
                             set line [regsub "$list_match\\s*" $line {}]
+
+                            # prevent recursion on same line
+                            set line [regsub {\A(\d+)\.(\s+)}   $line {\1\.\2}]
+                            set line [regsub {\A(\*|\+|-)(\s+)} $line {\\\1\2}]
+
+                            lappend item_result $line
                             set in_p 1
+                            continue
                         }
 
                         if {[IsEmptyLine $line]} {
@@ -298,9 +308,7 @@ proc ::markdown::ApplyTemplates {markdown {parent {}}} {
                             if {!$in_p} {
                                 incr p_count
                             }
-                            if {$peek != $index} {
-                                break
-                            }
+                            break
                         }\
                         elseif {!$in_p} {
                             break
