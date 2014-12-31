@@ -32,4 +32,5 @@ namespace eval ::markdown:: {
     variable library [file dirname [info script]]
 }
 
+source [file join $::markdown::library caius_markdown.tcl]
 source [file join $::markdown::library markdown.tcl]

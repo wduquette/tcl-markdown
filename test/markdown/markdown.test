@@ -62,6 +62,18 @@ proc cmp {s1 s2} {
     return [expr {$s1 eq $s2}]
 }
 
+proc dumpcmp {s1 s2} {
+    set s1 [string trim $s1]
+    set s2 [string trim $s2]
+
+    puts "# START S1"
+    puts $s1
+    puts "# START S2"
+    puts $s2
+    puts "# END TEXT"
+    puts "# LENGTH = [string length $s1], [string length $s2]"
+}
+
 # convert in
 #
 # in - markdown input, possibly indented.
@@ -292,6 +304,11 @@ test caius-1.6 {p_br_h_hr test} -body {
     cmp $html [markdown convert $md]
 } -result {1}
 
+test caius-1.7 {indent test} -body {
+    set md   [::tcltest::viewFile indent.md]
+    set html [::tcltest::viewFile indent.html]
+    cmp $html [markdown convert $md]
+} -result {1}
 
 #-------------------------------------------------------------------------
 # mdtest: Bugs found while running michelf/mdtest

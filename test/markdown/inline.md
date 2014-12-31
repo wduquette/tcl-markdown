@@ -22,6 +22,8 @@ Use [Google][] and [Yahoo] [] for search and read [News for Nerds][Slashdot] and
 [Slashdot]: <http://slashdot.org>       (News for Nerds)
 [HN]:       http://news.ycombinator.com 'Hacker News'
 
+Unknown ref: [bla][foo]
+
 Code
 ---
 
@@ -46,6 +48,7 @@ Automatic Links
 ---
 
 Write to <me@example.com> and visit <http://www.example.com>.
+This is an auto-link with ampersand: <http://example.com/?foo=1&bar=2>.
 
 Inline HTML
 ---

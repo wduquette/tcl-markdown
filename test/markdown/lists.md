@@ -68,3 +68,14 @@ only required to indent the first line. Lorem ipsum dolor
 sit amet, consectetuer adipiscing elit.
 
 *   Another item in the same list.
+
+
+1. 1. 1. Test that this does not recurse
+
+
+* * * Test that this does not recurse
+
+- - - Test that this does not recurse
+
++ + + Test that this does not recurse
+

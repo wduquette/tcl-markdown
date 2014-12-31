@@ -24,6 +24,6 @@ proc main {argv} {
 
     foreach infile $argv {
         set mdtext [readfile $infile]
-        puts [markdown convert $mdtext]
+        puts -nonewline [markdown convert $mdtext]
     }
 }
